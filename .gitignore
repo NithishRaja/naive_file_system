@@ -1,0 +1,7 @@
+# Ignore executables
+
+*.out
+
+# Ignore temp files
+
+*temp.*
