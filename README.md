@@ -2,11 +2,15 @@
 
 ## Running code
 
-* Run `g++ filesystem.cpp -o filesystem.out && ./filesystem.out`
+* To start the menu interface for filesystem, run `g++ cli_menu.cpp -o cli_menu.out && ./cli_menu.out`
 
 ## Editing code
 
-* The entire code is present inside `filesystem.cpp`
+* The main logic is present inside `filesystem.cpp`
+
+## Testing code
+
+* To run the unittest, run `g++ unittest.cpp -o unittest.out -lcunit`
 
 ## Features
 
