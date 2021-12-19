@@ -17,9 +17,8 @@
 // Set namespace
 using namespace std;
 
-FileSystem fs;
-
 void test_create_disk(void){
+  FileSystem fs;
   char file_name[10];
   strcpy(file_name, "test_disk");
   // Test creating a new disk
@@ -36,15 +35,47 @@ void test_create_disk(void){
 }
 
 void test_mount_disk(void){
+  FileSystem fs;
   char file_name[10];
   strcpy(file_name, "test_disk");
-  // Test creating a new disk
+  // Test mounting disk
   CU_ASSERT(fs.create_disk(file_name) == 1);
   CU_ASSERT(fs.mount_disk(file_name) == 0);
   CU_ASSERT(fs.unmount_disk(file_name) == 0);
   // Delete disk
   system("rm -rf test_disk");
   CU_ASSERT(fs.mount_disk(file_name) == -1);
+}
+
+void test_create_file(void){
+  FileSystem fs;
+  char disk_name[10];
+  char file_name[10];
+  strcpy(disk_name, "test_disk");
+  strcpy(file_name, "file1");
+  fs.create_disk(disk_name);
+  fs.mount_disk(disk_name);
+  // Test creating a new file
+  CU_ASSERT(fs.add_file_to_disk(file_name) == 1);
+  CU_ASSERT(fs.add_file_to_disk(file_name) == 0);
+  // Delete disk
+  system("rm -rf test_disk");
+}
+
+void test_delete_file(void){
+  FileSystem fs;
+  char disk_name[10];
+  char file_name[10];
+  strcpy(disk_name, "test_disk");
+  strcpy(file_name, "file1");
+  fs.create_disk(disk_name);
+  fs.mount_disk(disk_name);
+  // Test creating a new file
+  CU_ASSERT(fs.add_file_to_disk(file_name) == 1);
+  CU_ASSERT(fs.remove_file_from_disk(file_name) == 1);
+  CU_ASSERT(fs.remove_file_from_disk(file_name) == 0);
+  // Delete disk
+  system("rm -rf test_disk");
 }
 
 int main(){
@@ -61,7 +92,9 @@ int main(){
   }
 
   if((NULL == CU_add_test(pSuite, "test creating disk", test_create_disk))
-  || (NULL == CU_add_test(pSuite, "test mounting disk", test_mount_disk))){
+  || (NULL == CU_add_test(pSuite, "test mounting disk", test_mount_disk))
+  || (NULL == CU_add_test(pSuite, "test creating file", test_create_file))
+  || (NULL == CU_add_test(pSuite, "test deleting file", test_delete_file))){
     CU_cleanup_registry();
     return CU_get_error();
   }
