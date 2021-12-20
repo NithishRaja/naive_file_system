@@ -17,7 +17,6 @@ FileSystem fs;
 /*
  * Function to get user input and perform actions on files
  */
-/*
 void file_REPL(){
   // Display menu
   cout<<"1) Create file\n2) Open file\n3) Read file\n4) Write file\n5) Append file\n6) Close file\n7) Delete file\n8) List all files\n9) List opened files\n10) Unmount\n";
@@ -28,7 +27,7 @@ void file_REPL(){
       char file_name[FILE_NAME_SIZE];
       cout<<"Enter filename: ";
       cin>>file_name;
-      int res = add_file_to_disk(file_name);
+      int res = fs.add_file_to_disk(file_name);
       if(res == 0){
         cout<<"File exists\n";
       }else if(res == -1){
@@ -43,7 +42,7 @@ void file_REPL(){
       int mode;
       cout<<"1) Read mode\n2) Write mode\n3) Append mode\n";
       cin>>mode;
-      int res = open_file(file_name, mode);
+      int res = fs.open_file(file_name, mode);
       if(res >= 0){
         cout<<"File opened with file descriptor: "<<res<<endl;
       }else{
@@ -54,9 +53,9 @@ void file_REPL(){
       cout<<"Enter file descriptor: ";
       cin>>fd;
       // Check if file was opened in read mode
-      int mode_check = check_file_mode(fd, 1);
+      int mode_check = fs.check_file_mode(fd, 1);
       if(mode_check){
-        display_file(fd);
+        fs.display_file(fd);
       }else{
         cout<<"File was not opened in read mode\n";
       }
@@ -65,7 +64,7 @@ void file_REPL(){
       cout<<"Enter file descriptor: ";
       cin>>fd;
       // Check if file was opened in read mode
-      int mode_check = check_file_mode(fd, 2);
+      int mode_check = fs.check_file_mode(fd, 2);
       if(mode_check){
         // Read in string to write to file
         char buffer[BLOCK_SIZE];
@@ -74,22 +73,23 @@ void file_REPL(){
           buffer[buffer_size-1] = '\0';
           --buffer_size;
         }
-        int first_write = 1;
-        for(int i=0;i<open_file_list.size();++i){
-          if(open_file_list[i].fd == fd){
-            if(open_file_list[i].write_status == 1){
-              first_write = 0;
-            }else{
-              open_file_list[i].write_status = 1;
-            }
-            break;
-          }
-        }
-        if(first_write){
-          write_to_file(fd, buffer, buffer_size);
-        }else{
-          append_to_file(fd, buffer, buffer_size);
-        }
+        fs.write_to_file(fd, buffer, buffer_size);
+        // int first_write = 1;
+        // for(int i=0;i<open_file_list.size();++i){
+        //   if(open_file_list[i].fd == fd){
+        //     if(open_file_list[i].write_status == 1){
+        //       first_write = 0;
+        //     }else{
+        //       open_file_list[i].write_status = 1;
+        //     }
+        //     break;
+        //   }
+        // }
+        // if(first_write){
+        //   fs.write_to_file(fd, buffer, buffer_size);
+        // }else{
+        //   fs.append_to_file(fd, buffer, buffer_size);
+        // }
         cout<<"Wrote file\n";
       }else{
         cout<<"File was not opened in write mode\n";
@@ -99,7 +99,7 @@ void file_REPL(){
       cout<<"Enter file descriptor: ";
       cin>>fd;
       // Check if file was opened in read mode
-      int mode_check = check_file_mode(fd, 3);
+      int mode_check = fs.check_file_mode(fd, 3);
       if(mode_check){
         // Read in string to write to file
         char buffer[BLOCK_SIZE];
@@ -108,7 +108,7 @@ void file_REPL(){
           buffer[buffer_size-1] = '\0';
           --buffer_size;
         }
-        append_to_file(fd, buffer, buffer_size);
+        fs.append_to_file(fd, buffer, buffer_size);
         cout<<"Appended to file\n";
       }else{
         cout<<"File was not opened in append mode\n";
@@ -117,7 +117,7 @@ void file_REPL(){
       int fd;
       cout<<"Enter file descriptor: ";
       cin>>fd;
-      int res = close_file(fd);
+      int res = fs.close_file(fd);
       if(res){
         cout<<"File closed\n";
       }else{
@@ -127,32 +127,29 @@ void file_REPL(){
       char file_name[FILE_NAME_SIZE];
       cout<<"Enter filename: ";
       cin>>file_name;
-      int res = remove_file_from_disk(file_name);
+      int res = fs.remove_file_from_disk(file_name);
       if(res){
         cout<<"File deleted\n";
       }else{
         cout<<"No such file\n";
       }
     }else if(inp == 8){ // Display all files
-      for(int i=0;i<file_list.size();++i){
-        cout<<file_list[i].file_name<<" "<<file_list[i].inode_pos<<endl;
-      }
+      fs.display_all_files();
     }else if(inp == 9){ // Display open files
-      for(int i=0;i<open_file_list.size();++i){
-        cout<<open_file_list[i].file_name<<" fd: "<<open_file_list[i].fd<<" mode: "<<open_file_list[i].mode<<endl;
-      }
+      fs.display_open_files();
     }else if(inp == 10){
-      open_file_list.clear();
-      file_descriptor_count = 0;
-      file_list.clear();
-      cout<<"Umount successful\n";
+      int res = fs.unmount_disk();
+      if(res == -1){
+        cout<<"Umount unsuccessful\n";
+      }else{
+        cout<<"Umount successful\n";
+      }
       break;
     }else{
       cout<<"Not recognised\n";
     }
   }
 }
-*/
 
 /*
  * Function to get user input and perform actions on disks
@@ -187,7 +184,7 @@ void disk_REPL(){
       }else{
         cout<<"Failed to mount disk\n";
       }
-      // file_REPL();
+      file_REPL();
       res = fs.mount_disk(disk_name);
       if(res == 0){
         cout<<"Disk unmounted\n";

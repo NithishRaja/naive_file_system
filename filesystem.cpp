@@ -118,10 +118,13 @@ public:
    * -1 -- Failed to unmount disk (most likely, disk wasn't mounted)
    * 0 -- Successfully unmounted disk
    */
-  int unmount_disk(char* disk_name){
+  int unmount_disk(){
     if(fp == NULL){
       return -1;
     }
+    open_file_list.clear();
+    file_descriptor_count = 0;
+    file_list.clear();
     fclose(fp);
     return 0;
   }
@@ -296,6 +299,18 @@ public:
 
     update_super_block();
     return flag;
+  }
+
+  void display_all_files(){
+    for(int i=0;i<file_list.size();++i){
+      cout<<file_list[i].file_name<<" "<<file_list[i].inode_pos<<endl;
+    }
+  }
+
+  void display_open_files(){
+    for(int i=0;i<open_file_list.size();++i){
+      cout<<open_file_list[i].file_name<<" fd: "<<open_file_list[i].fd<<" mode: "<<open_file_list[i].mode<<endl;
+    }
   }
 
   /*
