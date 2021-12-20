@@ -128,6 +128,10 @@ public:
 
   /*
    * Function to get the first available inode in disk.
+   *
+   * Retval:
+   * -1 -- Empty inode not available
+   * Non negative integer -- Empty inode position
    */
   int get_empty_inode(){
     int pos = -1;
@@ -146,6 +150,10 @@ public:
 
   /*
    * Function to get the first available block in disk.
+   *
+   * Retval:
+   * -1 -- Empty block not available
+   * Non negative integer -- Empty block position
    */
   int get_empty_block(){
     int pos = -1;
@@ -193,6 +201,11 @@ public:
    * Function to create file with given filename on disk.
    * Parameters:
    * file_name -- char array
+   *
+   * Retval:
+   * -1 -- Memory not available to create file
+   * 0 -- Duplicate file name
+   * 1 -- File created successfully
    */
   int add_file_to_disk(char* file_name){
     // Check if file exists
@@ -240,6 +253,10 @@ public:
    * Function to delete given file from disk.
    * Parameters:
    * file_name -- char array
+   *
+   * Retval:
+   * 0 -- Failed to remove file
+   * 1 -- Successfully removed file
    */
   int remove_file_from_disk(char* file_name){
     // Initialise flag
@@ -286,11 +303,16 @@ public:
    * Parameters:
    * file_name -- char array
    * mode -- int
+   *
+   * Retval:
+   * -2 -- Mode not allowed
+   * -1 -- File doesn't exist
+   * Non negative integer -- File descriptor to opened file
    */
   int open_file(char* file_name, int mode){
     int fd = -1;
     if(mode != 1 && mode != 2 && mode != 3){
-      return fd;
+      return -2;
     }
     for(int i=0;i<file_list.size();++i){
       if(strcmp(file_list[i].file_name, file_name) == 0){
@@ -311,6 +333,13 @@ public:
 
   /*
    * Function to check if file was opened with given mode.
+   * Parameters:
+   * fd -- int
+   * mode -- int
+   *
+   * Retval:
+   * 0 -- File was not opened with given file node
+   * 1 -- File was opened with given file node
    */
   int check_file_mode(int fd, int mode){
     int flag = 0;
@@ -328,6 +357,8 @@ public:
   /*
    * Function to print contents of file.
    * It is assumed that all checks (file exists and opened in read mode) have been done.
+   * Parameters:
+   * fd -- int
    */
   void display_file(int fd){
     for(int i=0;i<open_file_list.size();++i){
@@ -364,6 +395,10 @@ public:
   /*
    * Function to write a character to a file.
    * It is assumed that all checks (file exists and opened in write mode) have been done.
+   * Parameters:
+   * fd -- int
+   * buffer -- char array
+   * buffer_size -- int
    */
   void write_to_file(int fd, char* buffer, int buffer_size){
     for(int i=0;i<open_file_list.size();++i){
@@ -438,6 +473,10 @@ public:
   /*
    * Function to append a character to a file.
    * It is assumed that all checks (file exists and opened in append mode) have been done.
+   * Parameters:
+   * fd -- int
+   * buffer -- char array
+   * buffer_size -- int
    */
   void append_to_file(int fd, char* buffer, int buffer_size){
     for(int i=0;i<open_file_list.size();++i){
