@@ -393,6 +393,47 @@ public:
   }
 
   /*
+   * Function to read given number of characters from file.
+   * It is assumed that all checks (file exists and opened in write mode) have been done.
+   * Parameters:
+   * fd -- int
+   * buffer -- char array
+   * buffer_size -- int
+   */
+  void read_from_file(int fd, char* buffer, int buffer_size){
+    for(int i=0;i<open_file_list.size();++i){
+      if(open_file_list[i].fd == fd){
+        int inode_pos = open_file_list[i].inode_pos;
+        // Read from inode
+        vector<struct inode_data> inode_data_list;
+        fseek(fp, (inode_pos-1)*BLOCK_SIZE, 0);
+        int block_count;
+        fread(&block_count, sizeof(block_count), 1, fp);
+        for(int j=0;j<block_count;++j){
+          struct inode_data data;
+          fread(&data, sizeof(data), 1, fp);
+          inode_data_list.push_back(data);
+        }
+        // Read from block
+        for(int j=0;j<inode_data_list.size()&&j<buffer_size;++j){
+          int block_pos = inode_data_list[j].block_pos;
+          int block_filled = inode_data_list[j].block_filled;
+          fseek(fp, (block_pos-1)*BLOCK_SIZE, 0);
+          // Print contents of block
+          for(int k=0;k<block_filled;++k){
+            char ch;
+            fread(&ch, sizeof(ch), 1, fp);
+            // cout<<ch;
+            buffer[j*BLOCK_SIZE+k] = ch;
+          }
+        }
+        // cout<<endl;
+        break;
+      }
+    }
+  }
+
+  /*
    * Function to write a character to a file.
    * It is assumed that all checks (file exists and opened in write mode) have been done.
    * Parameters:

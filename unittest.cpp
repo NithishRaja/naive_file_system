@@ -111,7 +111,23 @@ void test_file_write(void){
   char line[10];
   strcpy(line, "hello");
   fs.write_to_file(fd, line, 5);
-  fs.display_file(fd);
+  // fs.display_file(fd);
+  fs.close_file(fd);
+  char out[10];
+  fd = fs.open_file(file_name, 1);
+  bzero(out, 10);
+  fs.read_from_file(fd, out, 5);
+  CU_ASSERT(strcmp(out, "hello") == 0);
+  fs.close_file(fd);
+
+  fd = fs.open_file(file_name, 2);
+  strcpy(line, " helllo");
+  fs.write_to_file(fd, line, 7);
+  fs.close_file(fd);
+  fd = fs.open_file(file_name, 1);
+  bzero(out, 10);
+  fs.read_from_file(fd, out, 7);
+  CU_ASSERT(strcmp(out, " helllo") == 0);
   fs.close_file(fd);
   // Delete disk
   system("rm -rf test_disk");
@@ -132,9 +148,22 @@ void test_file_append(void){
   char line[10];
   strcpy(line, "hello");
   fs.append_to_file(fd, line, 5);
+  fs.close_file(fd);
+  char out[20];
+  fd = fs.open_file(file_name, 1);
+  bzero(out, 20);
+  fs.read_from_file(fd, out, 5);
+  CU_ASSERT(strcmp(out, "hello") == 0);
+  fs.close_file(fd);
+
+  fd = fs.open_file(file_name, 2);
   strcpy(line, " helllo");
   fs.append_to_file(fd, line, 7);
-  fs.display_file(fd);
+  fs.close_file(fd);
+  fd = fs.open_file(file_name, 1);
+  bzero(out, 20);
+  fs.read_from_file(fd, out, 12);
+  CU_ASSERT(strcmp(out, "hello helllo") == 0);
   fs.close_file(fd);
   // Delete disk
   system("rm -rf test_disk");
@@ -158,8 +187,8 @@ int main(){
   || (NULL == CU_add_test(pSuite, "test creating file", test_create_file))
   || (NULL == CU_add_test(pSuite, "test deleting file", test_delete_file))
   || (NULL == CU_add_test(pSuite, "test opening and closing file", test_file_open_and_close))
-  || (NULL == CU_add_test(pSuite, "test writing and reading file", test_file_write))
-  || (NULL == CU_add_test(pSuite, "test writing and reading file", test_file_append))){
+  || (NULL == CU_add_test(pSuite, "test writing file", test_file_write))
+  || (NULL == CU_add_test(pSuite, "test appending file", test_file_append))){
     CU_cleanup_registry();
     return CU_get_error();
   }
